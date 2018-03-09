@@ -29,8 +29,11 @@ while page <= PAGE_COUNT:
 # parse data
 data_table = []
 
-for filename in os.listdir('./data_lists/'):
-    print(filename)
+## get files
+lst = os.listdir('./data_lists/')
+lst.sort()
+
+for filename in lst:
     if filename.find('html') == -1:
         continue
     filepath = './data_lists/' + filename
@@ -42,9 +45,17 @@ for filename in os.listdir('./data_lists/'):
     items = soup.find('table', {'class': 'table-hover'}).find('tbody').find_all('tr')
 
     for item in items:
+        main = item.find('a', {'class': 'player_name_players_table'}).text
+        info = item.find('span', {'class': 'players_club_nation'})
+
         tmp_dict = {
-            'name': item.find('a', {'class': 'player_name_players_table'}).text
+            'name': main[0 : main.find(' (')],
+            'position': main[main.find('(') + 1 : main.find(' )')],
+            'club': info.select('a')[0]['data-original-title'],
+            'nation': info.select('a')[1]['data-original-title'],
+            'league': info.select('a')[2]['data-original-title']
         }
+
         data_table.append(tmp_dict)
     
 print(data_table)
