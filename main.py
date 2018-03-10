@@ -47,15 +47,35 @@ for filename in lst:
     for item in items:
         main = item.find('a', {'class': 'player_name_players_table'}).text
         info = item.find('span', {'class': 'players_club_nation'})
+        main_img = item.find('img', {'class': 'player_img'})['src']
+        version_info = item.find('span', {'class': 'rating'})['class'][2:-1]
+        version_info.reverse()
 
         tmp_dict = {
             'name': main[0 : main.find(' (')],
             'position': main[main.find('(') + 1 : main.find(' )')],
-            'club': info.select('a')[0]['data-original-title'],
-            'nation': info.select('a')[1]['data-original-title'],
-            'league': info.select('a')[2]['data-original-title']
+            'club': {
+                'name': info.select('a')[0]['data-original-title'],
+                'img': info.select('a')[0].find('img')['src']
+            },
+            'nation': {
+                'name': info.select('a')[1]['data-original-title'],
+                'img': info.select('a')[1].find('img')['src']
+            },
+            'league': {
+                'name': info.select('a')[2]['data-original-title'],
+                'img': info.select('a')[2].find('img')['src']
+            },
+            'img': main_img,
+            'version': {
+                'quality': version_info[1],
+                'type': version_info[0],
+                'special': version_info[len(version_info) - 1] if len(version_info) == 3 else 'null'
+            },
+            'rating': int(item.find('span', {'class': 'rating'}).text)
         }
 
         data_table.append(tmp_dict)
+        print(tmp_dict)
     
-print(data_table)
+# print(data_table)
