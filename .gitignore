@@ -2,3 +2,4 @@ page_*.html
 environment.py
 ./data_lists
 __pycache__
+*.csv

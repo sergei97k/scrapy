@@ -7,6 +7,7 @@ import re
 import os
 import json
 import time
+import pandas as pd
 
 PAGE_COUNT = environment.PAGE_COUNT
 URL = environment.URL
@@ -94,6 +95,7 @@ for filename in lst:
         }
 
         data_table.append(tmp_dict)
-        print(tmp_dict)
-    
-# print(data_table)
+
+# saving data to CSV format
+df = pd.DataFrame(data_table)
+df.to_csv('data.csv', encoding = 'utf-8')    
