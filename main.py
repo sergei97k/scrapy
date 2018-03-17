@@ -9,6 +9,11 @@ import json
 import time
 import pandas as pd
 from collections import OrderedDict
+import pymongo
+from pymongo import MongoClient
+
+#connect to db
+client = MongoClient()
 
 PAGE_COUNT = environment.PAGE_COUNT
 URL = environment.URL
@@ -103,3 +108,6 @@ if __name__ == '__main__':
     loadFiles()
     getFilesData()
     saveToCsv()
+
+    db = client.test;
+    print(db);
