@@ -12,14 +12,15 @@ from collections import OrderedDict
 import pymongo
 from pymongo import MongoClient
 
-#connect to db
-client = MongoClient()
-
 PAGE_COUNT = environment.PAGE_COUNT
 URL = environment.URL
 LIMIT_GAMES = environment.LIMIT_GAMES
+MONGO_DB = environment.MONGO_DB
 
 data_table = []
+
+#connect to db
+client = MongoClient(MONGO_DB)
 
 def load_data(page):
     url = URL % (page)
@@ -34,7 +35,6 @@ def loadFiles():
         data = load_data(page)
         with open('./data_lists/page_%d.html' % (page), 'w') as output_file:
             output_file.write(data)
-            print(page)
             page += 1
 
 
@@ -91,8 +91,8 @@ def getFilesData():
                     ('version_quality', version_info[1]),
                     ('version_type', version_info[0]),
                     ('version_special', version_info[len(version_info) - 1] if len(version_info) == 3 else 'null'),
-                    ('price_ps4', item.find('span', {'class': 'ps4_color'}).text),
-                    ('price_xb1', item.find('span', {'class': 'xb1_color'}).text)
+                    ('price_ps4', float(item.find('span', {'class': 'ps4_color'}).text[:-1])),
+                    ('price_xb1', float(item.find('span', {'class': 'xb1_color'}).text[:-1]))
                 ])
 
                 data_table.append(tmp_dict)
@@ -104,10 +104,18 @@ def saveToCsv():
     df = pd.DataFrame(data_table)
     df.to_csv('data.csv', encoding = 'utf-8', index=False)
 
+def saveToDB(data_source):
+    db = client.players;
+    collection = db.players
+
+    #remove old data
+    collection.delete_many({})
+
+    for item in data_source:
+        collection.insert_one(item).inserted_id
+
 if __name__ == '__main__':
     loadFiles()
     getFilesData()
     saveToCsv()
-
-    db = client.test;
-    print(db);
+    saveToDB(data_table)
